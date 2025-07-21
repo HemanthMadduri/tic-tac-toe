@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic Tac Toe</title>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .board { display: grid; grid-template-columns: repeat(3, 100px); margin: auto; }
+    .cell {
+      width: 100px; height: 100px;
+      border: 1px solid #333;
+      font-size: 48px; display: flex;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <p id="message"></p>
+
+  <script>
+    const board = document.getElementById("board");
+    let cells = Array(9).fill(null);
+    let isPlayerTurn = true;
+
+    function checkWinner(cells) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let [a,b,c] of wins) {
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c])
+          return cells[a];
+      }
+      return cells.includes(null) ? null : "Draw";
+    }
+
+    function render() {
+      board.innerHTML = "";
+      cells.forEach((value, i) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = value;
+        cell.onclick = () => {
+          if (!value && isPlayerTurn) {
+            cells[i] = "X";
+            isPlayerTurn = false;
+            update();
+            setTimeout(aiMove, 500);
+          }
+        };
+        board.appendChild(cell);
+      });
+    }
+
+    function aiMove() {
+      let empty = cells.map((v,i) => v === null ? i : null).filter(i => i !== null);
+      if (empty.length) {
+        let move = empty[Math.floor(Math.random() * empty.length)];
+        cells[move] = "O";
+        isPlayerTurn = true;
+        update();
+      }
+    }
+
+    function update() {
+      render();
+      let winner = checkWinner(cells);
+      if (winner) {
+        document.getElementById("message").textContent =
+          winner === "Draw" ? "It’s a draw!" : `${winner} wins!`;
+        board.style.pointerEvents = "none";
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
